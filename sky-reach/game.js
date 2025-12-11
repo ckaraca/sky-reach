@@ -27,6 +27,9 @@ const PLATFORM_WIDTH = 600;
 const PLATFORM_HEIGHT = 6;
 const PLATFORM_SPACING = 100;
 
+// Game loop constants
+const MAX_DELTA_TIME = 0.1; // 100ms max - prevents physics explosions after tab switching
+
 // Colors
 const COLOR_BACKGROUND = '#0a0e27';
 const COLOR_PLAYER = '#ff6b35';
@@ -71,7 +74,16 @@ const keys = {
 // ============================================================================
 
 const canvas = document.getElementById('gameCanvas');
+if (!canvas) {
+    console.error('Canvas element not found!');
+    throw new Error('Failed to initialize game: Canvas element missing');
+}
+
 const ctx = canvas.getContext('2d');
+if (!ctx) {
+    console.error('Could not get 2D context from canvas');
+    throw new Error('Failed to initialize game: Canvas context unavailable');
+}
 
 // ============================================================================
 // GAME LOOP
@@ -80,8 +92,11 @@ const ctx = canvas.getContext('2d');
 let lastTime = 0;
 
 function gameLoop(currentTime) {
-    const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+    let deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
     lastTime = currentTime;
+
+    // Clamp delta time to prevent physics explosions after tab switching
+    deltaTime = Math.min(deltaTime, MAX_DELTA_TIME);
 
     // Update game
     update(deltaTime);
@@ -98,8 +113,10 @@ function gameLoop(currentTime) {
 // ============================================================================
 
 function update(deltaTime) {
+    // Always update time for animations (menu pulse, etc.)
+    gameState.time += deltaTime;
+
     if (gameState.state === 'playing') {
-        gameState.time += deltaTime;
         // TODO: Update player, meteors, collisions, etc.
     }
 }
@@ -142,9 +159,14 @@ function renderMenu() {
     ctx.fillText('Avoid falling meteors', CANVAS_WIDTH / 2, 320);
     ctx.fillText('Collect stars for bonus points', CANVAS_WIDTH / 2, 360);
 
+    // Pulsing "Press SPACE to Start" text
+    ctx.save(); // Save context state
     ctx.font = '32px Arial';
+    const pulseAlpha = 0.5 + Math.abs(Math.sin(gameState.time * 2)) * 0.5;
     ctx.fillStyle = COLOR_LADDER;
+    ctx.globalAlpha = pulseAlpha;
     ctx.fillText('Press SPACE to Start', CANVAS_WIDTH / 2, 480);
+    ctx.restore(); // Restore context state
 }
 
 function renderGame() {
@@ -183,20 +205,20 @@ function renderLoseScreen() {
 // BACKGROUND EFFECTS
 // ============================================================================
 
+// Pre-generate stars with Path2D for optimal rendering performance
+const starPath = new Path2D();
 const stars = [];
 for (let i = 0; i < 100; i++) {
-    stars.push({
-        x: Math.random() * CANVAS_WIDTH,
-        y: Math.random() * CANVAS_HEIGHT,
-        size: Math.random() * 2
-    });
+    const x = Math.random() * CANVAS_WIDTH;
+    const y = Math.random() * CANVAS_HEIGHT;
+    const size = Math.random() * 2;
+    stars.push({ x, y, size });
+    starPath.rect(x, y, size, size);
 }
 
 function drawStarfield() {
     ctx.fillStyle = COLOR_TEXT;
-    stars.forEach(star => {
-        ctx.fillRect(star.x, star.y, star.size, star.size);
-    });
+    ctx.fill(starPath); // Single draw call for all 100 stars!
 }
 
 // ============================================================================
