@@ -142,9 +142,13 @@ function renderMenu() {
     ctx.fillText('Avoid falling meteors', CANVAS_WIDTH / 2, 320);
     ctx.fillText('Collect stars for bonus points', CANVAS_WIDTH / 2, 360);
 
+    // Pulsing "Press SPACE to Start" text
     ctx.font = '32px Arial';
+    const pulseAlpha = 0.5 + Math.abs(Math.sin(Date.now() / 500)) * 0.5;
     ctx.fillStyle = COLOR_LADDER;
+    ctx.globalAlpha = pulseAlpha;
     ctx.fillText('Press SPACE to Start', CANVAS_WIDTH / 2, 480);
+    ctx.globalAlpha = 1.0; // Reset alpha
 }
 
 function renderGame() {
