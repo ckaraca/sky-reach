@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Reach - Arcade Climbing Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(180deg, #0a0e27 0%, #000000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        #gameContainer {
+            text-align: center;
+        }
+
+        canvas {
+            border: 2px solid #00d9ff;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            background: #0a0e27;
+        }
+
+        #info {
+            color: #ffffff;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        #info a {
+            color: #00d9ff;
+            text-decoration: none;
+        }
+
+        #info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="info">
+            <p>Controls: Arrow Keys to Move | Spacebar to Jump | Up/Down to Climb Ladders</p>
+            <p>Goal: Reach the spacecraft at the top while avoiding meteors!</p>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
